@@ -37,3 +37,10 @@
   }
 }
 
+.toka{
+  display: flex;
+  margin-top: 100px;
+  margin-left: 25px;
+  gap: 4rem;
+  margin-right: 25px;
+}

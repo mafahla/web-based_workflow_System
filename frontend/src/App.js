@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import "bootstrap/dist/css/bootstrap.min.css";
 import logo from "./logo.svg";
 import "./App.css";
 import * as XLSX from "xlsx";
@@ -12,9 +13,9 @@ import {
   YAxis,
 } from "recharts";
 import Table from "react-bootstrap/Table";
-import Col from 'react-bootstrap/Col';
-import Form from 'react-bootstrap/Form';
-import Row from 'react-bootstrap/Row';
+import Col from "react-bootstrap/Col";
+import Form from "react-bootstrap/Form";
+import Row from "react-bootstrap/Row";
 // import Table from "./Components/Table"
 
 function App() {
@@ -58,75 +59,80 @@ function App() {
   const Income = items.map((item) => item.Income);
   const Month = items.map((item) => item.Month);
   const Expenses = items.map((item) => item.Expenses);
+  
 
   return (
     <div>
+      <Form>
+        <Row>
+          <Col>
+            <Form.Control placeholder="First name" />
+          </Col>
+          <Col>
+            <Form.Control placeholder="Last name" />
+          </Col>
+        </Row>
+        <input
+          type="date"
+          onChange={(e) => {
+            const file = e.target.files[0];
+            readExcel(file);
+          }}
+        />
+        <input
+          type="file"
+          onChange={(e) => {
+            const file = e.target.files[0];
+            readExcel(file);
+          }}
+        />
+      </Form>
 
-<Form>
-      <Row>
-        <Col>
-          <Form.Control placeholder="First name" />
-        </Col>
-        <Col>
-          <Form.Control placeholder="Last name" />
-        </Col>
-
-      </Row>
-      <input
-        type="date"
-        onChange={(e) => {
-          const file = e.target.files[0];
-          readExcel(file);
-        }}
-      />
-      <input
-        type="file"
-        onChange={(e) => {
-          const file = e.target.files[0];
-          readExcel(file);
-        }}
-      />
-    </Form>
-      
-<Table />
-      <Table striped bordered hover variant="dark">
-        <thead>
-          <tr>
-            <th scope="col">Month</th>
-            <th scope="col">Income</th>
-            <th scope="col">Expenses</th>
-          </tr>
-        </thead>
-        <tbody>
-          {items.map((d) => (
-            <tr key={d.id}>
-              <th>{d.Month}</th>
-              <td>{d.Income}</td>
-              <td>{d.Expenses}</td>
+      <div className="toka">
+        <Table striped bordered hover style={{ width: "500px" }}>
+          <thead>
+            <tr>
+              <th scope="col">Month</th>
+              <th scope="col">Income</th>
+              <th scope="col">Expenses</th>
             </tr>
-          ))}
-        </tbody>
-      </Table>
+          </thead>
+          <tbody>
+            {items.map((d) => (
+              <tr key={d.id}>
+                <th>{d.Month}</th>
+                <td>{d.Income}</td>
+                <td>{d.Expenses}</td>
+              </tr>
+            ))}
+          </tbody>
+        </Table>
 
-      <LineChart width={1100} height={600} data={items}>
-        <Line
-          type="monotone"
-          dataKey="Income"
-          stroke="#2196F3"
-          strokeWidth={3}
-        />
-        <Line
-          type="monotone"
-          dataKey="Expenses"
-          stroke="#F44236"
-          strokeWidth={3}
-        />
-        <CartesianGrid stroke="#ccc" />
-        <XAxis dataKey="Month" />
-        <YAxis />
-        <Tooltip />
-        <Legend />
-      </LineChart>
+        <LineChart width={1100} height={600} data={items}>
+          <Line
+            type="monotone"
+            dataKey="Income"
+            stroke="#2196F3"
+            strokeWidth={3}
+          />
+          <Line
+            type="monotone"
+            dataKey="Expenses"
+            stroke="#F44236"
+            strokeWidth={3}
+          />
+          <CartesianGrid stroke="#ccc" />
+          <XAxis dataKey="Month" />
+          <YAxis />
+          <Tooltip />
+          <Legend />
+        </LineChart>
+      </div>
+
+
+
+
+
     </div>
   );
 }
