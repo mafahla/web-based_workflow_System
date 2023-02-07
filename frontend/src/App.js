@@ -1,5 +1,5 @@
-import React, { useState,useEffect } from "react";
-import axios from 'axios';
+import React, { useState, useEffect } from "react";
+import axios from "axios";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "./App.css";
 import * as XLSX from "xlsx";
@@ -18,7 +18,6 @@ import Form from "react-bootstrap/Form";
 import Row from "react-bootstrap/Row";
 import Button from "react-bootstrap/Button";
 import Modal from "react-bootstrap/Modal";
-
 
 function App() {
   const [items, setItems] = useState([]);
@@ -63,20 +62,36 @@ function App() {
   const Month = items.map((item) => item.Month);
   const Expenses = items.map((item) => item.Expenses);
 
-
-
   const [modalShow, setModalShow] = React.useState(false);
 
-  const [show, setShow] = useState(false);
   const [show1, setShow1] = useState(false);
-
-  const handleClose = () => setShow(false);
   const handleClose1 = () => setShow1(false);
-  const handleShow = () => setShow(true);
   const handleShow1 = () => setShow1(true);
 
+  const [formData, setFormData] = useState({
+    firstName: "",
+    lastName: "",
+    birth: "",
+  });
 
-
+  const handleChange = (event) => {
+    setFormData({
+      ...formData,
+      [event.target.name]: event.target.value,
+    });
+    console.log(formData);
+  };
+  const handleSubmit = (event) => {
+    event.preventDefault();
+    axios
+      .post("http://localhost:1337/api/customers", { data: formData })
+      .then((response) => {
+        console.log(response);
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  };
 
   const [customer, setCustomer] = useState([]);
   const [loader, setLoading] = useState(false);
@@ -95,118 +110,98 @@ function App() {
               console.log(error);
               setLoading(true);
           });
-
-          const workbook = XLSX.readFile({data});
-              const sheetName = workbook.SheetNames[0];
-              const sheet = workbook.Sheets[sheetName];
-              const data = XLSX.utils.sheet_to_json(sheet);
-              return data
   }, [])
-
-
-
-  async function fetchExcelData() {
-    const workbook = XLSX.readFile(data);
-    const sheetName = workbook.SheetNames[0];
-    const sheet = workbook.Sheets[sheetName];
-    const data = XLSX.utils.sheet_to_json(sheet);
-    return data;
-  }
-
 
   return (
     <div>
-      <Button variant="primary" onClick={handleShow}>
-        Launch demo modal
-      </Button>
-
-      <Modal show={show} onHide={handleClose}>
-        <Modal.Header closeButton>
-          <Modal.Title>Modal heading</Modal.Title>
-        </Modal.Header>
-        <Modal.Body>
-          <Form>
-            <Row>
-              <Col>
-                <Form.Control placeholder="First name" />
-              </Col>
-              <Col>
-                <Form.Control placeholder="Last name" />
-              </Col>
-            </Row>
-            <input
-              type="date"
-              onChange={(e) => {
-                const file = e.target.files[0];
-                readExcel(file);
-              }}
+      <Form className="form" onClick={handleSubmit}>
+        <Row>
+          <Col>
+            <Form.Control
+            className="control"
+              placeholder="First name"
+              type="text"
+              name="firstName"
+              onChange={handleChange}
+              value={formData.firstName}
             />
-            <input
-              type="file"
-              onChange={(e) => {
-                const file = e.target.files[0];
-                readExcel(file);
-              }}
+          </Col>
+          <Col>
+            <Form.Control
+            className="control"
+              placeholder="Last name"
+              type="text"
+              name="lastName"
+              onChange={handleChange}
+              value={formData.lastName}
             />
-          </Form>
-        </Modal.Body>
-        <Modal.Footer>
-          <Button variant="secondary" onClick={handleClose}>
-            Close
-          </Button>
-          <Button variant="primary" onClick={handleClose}>
-            Save Changes
-          </Button>
-        </Modal.Footer>
-      </Modal>
+          </Col>
+        </Row>
+        <Row>
+          <Col>
+          <Form.Control
+          className="control"
+            type="date"
+            name="birth"
+            onChange={handleChange}
+            value={formData.birth}
+          />
+          </Col>
+          <Col>
+          <Button className="control" variant="success" >
+          Add New
+        </Button>
+          </Col>
+        </Row>
+        
+        
+      </Form>
 
-      <Table striped bordered hover variant="dark">
+      <Table striped bordered hover  className="table">
         <thead>
           <tr>
             <th>First Name</th>
             <th>Last Name</th>
             <th>Date of Birth</th>
+            <th>Excel Upload</th>
             <th></th>
           </tr>
         </thead>
         <tbody>
-
-          {loader && customer.map((cust)=> (
-          <tr key={cust.id}>
-            <td>{cust.attributes.firstName}</td>
-            <td>{cust.attributes.lastName}</td>
-            <td>{cust.attributes.birth}</td>
-            <td>
-              <Button variant="primary"  onClick={handleShow1}>
-                Launch vertically centered modal
-              </Button>
-
-              
-            </td>
-          </tr>
-          ))}
-          
+          {loader &&
+            customer.map((cust) => (
+              <tr key={cust.id}>
+                <td>{cust.attributes.firstName}</td>
+                <td>{cust.attributes.lastName}</td>
+                <td>{cust.attributes.birth}</td>
+                <td><input
+                type="file"
+                onChange={(e) => {
+                  const file = e.target.files[0];
+                  readExcel(file);
+                }}
+              /></td>
+                <td>
+                  <Button variant="primary" onClick={handleShow1}>
+                    View Graph
+                  </Button>
+                </td>
+              </tr>
+            ))}
         </tbody>
       </Table>
 
-
-
-
-
-
-
-
       <Modal
         style={{ width: "100rem" }}
-     
         size="lg"
         aria-labelledby="contained-modal-title-vcenter"
         centered
-        show={show1} onHide={handleClose1}
+        show={show1}
+        onHide={handleClose1}
       >
         <Modal.Header closeButton>
           <Modal.Title id="contained-modal-title-vcenter">
-            Modal heading
+           Graph
           </Modal.Title>
         </Modal.Header>
         <Modal.Body>
@@ -221,13 +216,12 @@ function App() {
               </thead>
               <tbody>
                 {items.map((d) => (
-
                   <tr key={d.id}>
                     <th>{d.Month}</th>
                     <td>{d.Income}</td>
                     <td>{d.Expenses}</td>
                   </tr>
-                ))} 
+                ))}
               </tbody>
             </Table>
 
@@ -252,13 +246,11 @@ function App() {
             </LineChart>
           </div>
         </Modal.Body>
-        <Modal.Footer>
-        </Modal.Footer>
+        <Modal.Footer></Modal.Footer>
       </Modal>
     </div>
   );
 }
-
 
 // Graduate2023
 export default App;
