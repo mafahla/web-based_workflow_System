@@ -21,7 +21,17 @@ import Modal from "react-bootstrap/Modal";
 
 function App() {
   const [items, setItems] = useState([]);
-  const [data, setData] = useState([]);
+  const [modalShow, setModalShow] = React.useState(false);
+  const [show1, setShow1] = useState(false);
+  const handleClose1 = () => setShow1(false);
+  const handleShow1 = () => setShow1(true);
+  const [customer, setCustomer] = useState([]);
+  const [loader, setLoading] = useState(false);
+  const [formData, setFormData] = useState({
+    firstName: "",
+    lastName: "",
+    birth: "",
+  });
 
   const readExcel = (file) => {
     const promise = new Promise((resolve, reject) => {
@@ -53,26 +63,14 @@ function App() {
     });
   };
 
-  console.log(
-    items.map((item) => item.Income),
-    "items"
-  );
-
   const Income = items.map((item) => item.Income);
   const Month = items.map((item) => item.Month);
   const Expenses = items.map((item) => item.Expenses);
 
-  const [modalShow, setModalShow] = React.useState(false);
-
-  const [show1, setShow1] = useState(false);
-  const handleClose1 = () => setShow1(false);
-  const handleShow1 = () => setShow1(true);
-
-  const [formData, setFormData] = useState({
-    firstName: "",
-    lastName: "",
-    birth: "",
-  });
+  console.log(
+    items.map((item) => item.Income),
+    "items"
+  );
 
   const handleChange = (event) => {
     setFormData({
@@ -93,32 +91,30 @@ function App() {
       });
   };
 
-  const [customer, setCustomer] = useState([]);
-  const [loader, setLoading] = useState(false);
-
   useEffect(() => {
-      setLoading(false);
-      axios.get('http://localhost:1337/api/customers?populate=*')
-          .then(response => {
-              setLoading(true);
-              setCustomer(response.data.data);
-              console.log(response.data.data)
-              // console.log(customer[0].attributes.excel.data.attributes.name,"customer")
-              setData(customer[0].attributes.excel.data.attributes.name)
-          })
-          .catch(error => {
-              console.log(error);
-              setLoading(true);
-          });
-  }, [])
+    setLoading(false);
+    axios
+      .get("http://localhost:1337/api/customers?populate=*")
+      .then((response) => {
+        setLoading(true);
+        setCustomer(response.data.data);
+        console.log(response.data.data);
+        setData(customer[0].attributes.excel.data.attributes.name);
+      })
+      .catch((error) => {
+        console.log(error);
+        setLoading(true);
+      });
+  }, []);
 
   return (
+    
     <div>
       <Form className="form" onClick={handleSubmit}>
         <Row>
           <Col>
             <Form.Control
-            className="control"
+              className="control"
               placeholder="First name"
               type="text"
               name="firstName"
@@ -128,7 +124,7 @@ function App() {
           </Col>
           <Col>
             <Form.Control
-            className="control"
+              className="control"
               placeholder="Last name"
               type="text"
               name="lastName"
@@ -139,25 +135,23 @@ function App() {
         </Row>
         <Row>
           <Col>
-          <Form.Control
-          className="control"
-            type="date"
-            name="birth"
-            onChange={handleChange}
-            value={formData.birth}
-          />
+            <Form.Control
+              className="control"
+              type="date"
+              name="birth"
+              onChange={handleChange}
+              value={formData.birth}
+            />
           </Col>
           <Col>
-          <Button className="control" variant="success" >
-          Add New
-        </Button>
+            <Button className="control" variant="success">
+              Add New
+            </Button>
           </Col>
         </Row>
-        
-        
       </Form>
 
-      <Table striped bordered hover  className="table">
+      <Table striped bordered hover className="table">
         <thead>
           <tr>
             <th>First Name</th>
@@ -174,13 +168,15 @@ function App() {
                 <td>{cust.attributes.firstName}</td>
                 <td>{cust.attributes.lastName}</td>
                 <td>{cust.attributes.birth}</td>
-                <td><input
-                type="file"
-                onChange={(e) => {
-                  const file = e.target.files[0];
-                  readExcel(file);
-                }}
-              /></td>
+                <td>
+                  <input
+                    type="file"
+                    onChange={(e) => {
+                      const file = e.target.files[0];
+                      readExcel(file);
+                    }}
+                  />
+                </td>
                 <td>
                   <Button variant="primary" onClick={handleShow1}>
                     View Graph
@@ -200,9 +196,7 @@ function App() {
         onHide={handleClose1}
       >
         <Modal.Header closeButton>
-          <Modal.Title id="contained-modal-title-vcenter">
-           Graph
-          </Modal.Title>
+          <Modal.Title id="contained-modal-title-vcenter">Graph</Modal.Title>
         </Modal.Header>
         <Modal.Body>
           <div className="toka">
